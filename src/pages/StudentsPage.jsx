@@ -41,7 +41,9 @@ export default function StudentPage() {
     enrollmentNumber: "",
     semester: "",
     division: "",
+    password: ""
   });
+
   const [adding, setAdding] = useState(false);
 
   // selection + batch UI state (use Set for efficiency)
@@ -111,8 +113,8 @@ export default function StudentPage() {
   }, [students]); // eslint-disable-line
 
   const handleAddStudent = async () => {
-    if (!newStudent.name || !newStudent.enrollmentNumber || !newStudent.semester) {
-      toast.error("⚠️ Please fill in Name, Enrollment, and Semester");
+    if (!newStudent.name || !newStudent.enrollmentNumber || !newStudent.semester || !newStudent.password) {
+      toast.error("⚠️ Please fill in Name, Enrollment, Semester, and Password");
       return;
     }
 
@@ -120,7 +122,7 @@ export default function StudentPage() {
       setAdding(true);
       await addStudent(newStudent);
       toast.success("✅ Student added!");
-      setNewStudent({ name: "", enrollmentNumber: "", semester: "", division: "" });
+      setNewStudent({ name: "", enrollmentNumber: "", semester: "", division: "", password: "" });
       await fetchStudents();
     } catch (err) {
       console.error("Error adding student:", err);
@@ -132,6 +134,7 @@ export default function StudentPage() {
       setAdding(false);
     }
   };
+
 
   // Handle inline edit open (per-card loading)
   const handleEdit = async (id) => {
@@ -157,12 +160,16 @@ export default function StudentPage() {
     if (!selectedStudent || !selectedStudent._id) return;
     try {
       setSaving(true);
-      await updateStudent(selectedStudent._id, {
+      const updateData = {
         name: selectedStudent.name,
         enrollmentNumber: selectedStudent.enrollmentNumber,
         semester: selectedStudent.semester,
         division: selectedStudent.division,
-      });
+      };
+      if (selectedStudent.password && selectedStudent.password.trim() !== "") {
+        updateData.password = selectedStudent.password;
+      }
+      await updateStudent(selectedStudent._id, updateData);
       toast.success("✅ Student updated!");
       setSelectedStudent(null);
       await fetchStudents();
@@ -176,6 +183,7 @@ export default function StudentPage() {
       setSaving(false);
     }
   };
+
 
   // Handle delete
   const handleDelete = async (id) => {
@@ -464,62 +472,60 @@ export default function StudentPage() {
                   <strong>Required columns:</strong>
                   <ul className="list-disc list-inside ml-5">
                     <li>
-                      <code>enrollmentNumber</code> – Unique student enrollment/roll
-                      number
+                      <code>enrollmentNumber</code> – Unique student enrollment/roll number
                       <br />
                       <span className="text-gray-500 text-xs">
-                        Accepted headers: <code>enrollmentNumber</code>,{" "}
-                        <code>enrollment</code>, <code>enrollmentNo</code>,{" "}
-                        <code>enrollNumber</code>, <code>roll</code>,{" "}
-                        <code>rollNumber</code>, <code>id</code>
+                        Accepted headers: <code>enrollmentNumber</code>, <code>enrollment</code>, <code>enrollmentNo</code>, <code>enrollNumber</code>, <code>roll</code>, <code>rollNumber</code>, <code>id</code>
                       </span>
                     </li>
                     <li>
                       <code>name</code> – Student’s full name
                       <br />
                       <span className="text-gray-500 text-xs">
-                        Accepted headers: <code>name</code>, <code>studentName</code>,{" "}
-                        <code>fullName</code>, <code>student</code>
+                        Accepted headers: <code>name</code>, <code>studentName</code>, <code>fullName</code>, <code>student</code>
                       </span>
                     </li>
                     <li>
                       <code>semester</code> – Current semester (numeric)
                       <br />
                       <span className="text-gray-500 text-xs">
-                        Accepted headers: <code>semester</code>, <code>sem</code>,{" "}
-                        <code>classSemester</code>
+                        Accepted headers: <code>semester</code>, <code>sem</code>, <code>classSemester</code>
                       </span>
                     </li>
                     <li>
-                      <code>division</code> (optional) – Section/division for the
-                      class (e.g., A, B)
+                      <code>division</code> (optional) – Section/division for the class (e.g., A, B)
                       <br />
                       <span className="text-gray-500 text-xs">
-                        Accepted headers: <code>division</code>, <code>div</code>,{" "}
-                        <code>section</code>
+                        Accepted headers: <code>division</code>, <code>div</code>, <code>section</code>
+                      </span>
+                    </li>
+                    <li>
+                      <code>password</code> (optional) – Password for the student account
+                      <br />
+                      <span className="text-gray-500 text-xs">
+                        Accepted headers: <code>password</code>, <code>pass</code>, <code>pwd</code>
+                        <br />
+                        Leave this column blank to assign the default password <code>password123</code> to the student.
                       </span>
                     </li>
                   </ul>
                 </li>
                 <li>
-                  Column headers are <em>case-insensitive</em>. Example:{" "}
-                  <code>ENROLLMENTNO</code> or <code>Roll</code> are both valid.
+                  Column headers are <em>case-insensitive</em>. Example: <code>ENROLLMENTNO</code> or <code>Roll</code> are both valid.
                 </li>
                 <li>
                   Each row represents <strong>one student</strong>.
                   <br />
                   <span className="text-gray-500 text-xs">
-                    Example: Row with <code>enrollmentNumber = 2024CS001</code>,{" "}
-                    <code>name = John Doe</code>, <code>semester = 3</code>,{" "}
-                    <code>division = A</code>
+                    Example: Row with <code>enrollmentNumber = 2024CS001</code>, <code>name = John Doe</code>, <code>semester = 3</code>, <code>division = A</code>, <code>password = pass123</code>
                   </span>
                 </li>
                 <li>
-                  Duplicate enrollment numbers under the same HOD are automatically
-                  skipped.
+                  Duplicate enrollment numbers under the same HOD are automatically skipped.
                 </li>
               </ul>
             </div>
+
           )}
         </div>
       </div>
@@ -542,6 +548,13 @@ export default function StudentPage() {
             placeholder="🆔 Roll Number"
             value={newStudent.enrollmentNumber}
             onChange={(e) => setNewStudent({ ...newStudent, enrollmentNumber: e.target.value })}
+            className="px-3 py-2 border rounded-lg"
+          />
+          <input
+            type="password"
+            placeholder="🔑 Password"
+            value={newStudent.password}
+            onChange={(e) => setNewStudent({ ...newStudent, password: e.target.value })}
             className="px-3 py-2 border rounded-lg"
           />
           <input
@@ -761,6 +774,14 @@ export default function StudentPage() {
                           disabled={saving}
                         />
                       </div>
+                      <input
+                        type="password"
+                        value={selectedStudent.password || ""}
+                        onChange={(e) => setSelectedStudent((st) => ({ ...st, password: e.target.value }))}
+                        className="w-full border p-2 rounded mb-2"
+                        placeholder="New Password (leave blank to keep unchanged)"
+                        disabled={saving}
+                      />
                       <div className="flex gap-3">
                         <button
                           className="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg"
