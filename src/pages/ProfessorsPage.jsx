@@ -34,7 +34,7 @@ import { useConfirm } from "../components/ConfirmProvider";
 export default function ProfessorsPage() {
   const [professors, setProfessors] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({ name: "", username: "", password: "" });
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [editId, setEditId] = useState(null);
   const [error, setError] = useState("");
 
@@ -106,7 +106,7 @@ export default function ProfessorsPage() {
       setAdding(true);
       await addProfessor(form);
       toast.success("✅ Professor added");
-      setForm({ name: "", username: "", password: "" });
+      setForm({ name: "", email: "", password: "" });
       await fetchProfessors();
     } catch (err) {
       console.error("add error", err);
@@ -129,7 +129,7 @@ export default function ProfessorsPage() {
       if (!prof) throw new Error("Professor not found");
 
       // build update payload
-      const updatePayload = { name: prof.name, username: prof.username };
+      const updatePayload = { name: prof.name, email: prof.email };
       if (prof.password && prof.password.trim() !== "") {
         updatePayload.password = prof.password;
       }
@@ -224,7 +224,7 @@ export default function ProfessorsPage() {
       list = list.filter(
         (p) =>
           (p.name || "").toLowerCase().includes(s) ||
-          (p.username || "").toLowerCase().includes(s)
+          (p.email || "").toLowerCase().includes(s)
       );
     }
 
@@ -426,10 +426,10 @@ export default function ProfessorsPage() {
                       </span>
                     </li>
                     <li>
-                      <code>username</code> – Unique login ID (must not already exist)
+                      <code>email</code> – Unique login email (must not already exist)
                       <br />
                       <span className="text-gray-500 text-xs">
-                        Accepted headers: <code>username</code>, <code>user</code>, <code>login</code>
+                        Accepted headers: <code>email</code>, <code>e-mail</code>, <code>emailaddress</code>
                       </span>
                     </li>
                   </ul>
@@ -479,10 +479,10 @@ export default function ProfessorsPage() {
             disabled={adding}
           />
           <input
-            type="text"
-            placeholder="🔑 Username"
-            value={form.username}
-            onChange={(e) => setForm({ ...form, username: e.target.value })}
+            type="email"
+            placeholder="📧 Email"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
             className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-400"
             required
             disabled={adding}
@@ -534,7 +534,7 @@ export default function ProfessorsPage() {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="🔍 Search by name or username..."
+              placeholder="🔍 Search by name or email..."
               className="w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-400"
             />
           </div>
@@ -566,7 +566,7 @@ export default function ProfessorsPage() {
               title="Sort field"
             >
               <option value="name">Sort by Name</option>
-              <option value="username">Sort by Username</option>
+              <option value="email">Sort by email</option>
             </select>
 
             {/* Sort Direction */}
@@ -679,11 +679,11 @@ export default function ProfessorsPage() {
                   <BookOpen size={18} className="text-purple-500" />
                   {editId === prof._id ? (
                     <input
-                      value={prof.username}
+                      value={prof.email}
                       onChange={(e) =>
                         setProfessors((prev) =>
                           prev.map((p) =>
-                            p._id === prof._id ? { ...p, username: e.target.value } : p
+                            p._id === prof._id ? { ...p, email: e.target.value } : p
                           )
                         )
                       }
@@ -691,7 +691,7 @@ export default function ProfessorsPage() {
                       disabled={savingId === prof._id}
                     />
                   ) : (
-                    <span className="truncate">{prof.username}</span>
+                    <span className="truncate">{prof.email}</span>
                   )}
                 </p>
 

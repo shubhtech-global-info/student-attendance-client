@@ -505,7 +505,16 @@ export default function StudentPage() {
                       <span className="text-gray-500 text-xs">
                         Accepted headers: <code>password</code>, <code>pass</code>, <code>pwd</code>
                         <br />
-                        Leave this column blank to assign the default password <code>password123</code> to the student.
+                        Leave this column blank to assign the default password <strong>'Temp@1234'</strong> to the student.
+                        <br />
+                        <strong>Password requirements:</strong>
+                        <ul className="list-disc list-inside ml-5">
+                          <li>At least 8 characters long</li>
+                          <li>Contains at least one uppercase letter (A-Z)</li>
+                          <li>Contains at least one lowercase letter (a-z)</li>
+                          <li>Contains at least one digit (0-9)</li>
+                          <li>Contains at least one special character (e.g. !@#$%^&*(),.?":{ })</li>
+                        </ul>
                       </span>
                     </li>
                   </ul>
@@ -520,13 +529,10 @@ export default function StudentPage() {
                     Example: Row with <code>enrollmentNumber = 2024CS001</code>, <code>name = John Doe</code>, <code>semester = 3</code>, <code>division = A</code>, <code>password = pass123</code>
                   </span>
                 </li>
-                <li>
-                  Duplicate enrollment numbers under the same HOD are automatically skipped.
-                </li>
               </ul>
             </div>
-
           )}
+
         </div>
       </div>
 
